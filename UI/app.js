@@ -2,7 +2,7 @@ Dropzone.autoDiscover = false;
 
 function init() {
     let dz = new Dropzone("#dropzone", {
-        url: "/",
+        url: "http://127.0.0.1:5000",
         maxFiles: 1,
         addRemoveLinks: true,
         dictDefaultMessage: "Drop an image here or click to upload",
@@ -17,7 +17,6 @@ function init() {
 
     dz.on("complete", function (file) {
         let imageData = file.dataURL;
-        
         var url = "http://127.0.0.1:5000/classify_image";
 
         $.post(url, {

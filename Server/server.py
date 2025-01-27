@@ -10,7 +10,7 @@ def index():
 
 @app.route('/classify_image',methods=['GET','POST'])
 def classify_image():
-    image_data=request.json['image_data']
+    image_data=request.form['image_data']
     response=jsonify(utils.classify_image(image_data))
     response.headers.add('Access-Control-Allow-Origin', '*')
 

@@ -4,13 +4,14 @@ import numpy as np
 import joblib
 import json
 import warnings
+import base64
 warnings.filterwarnings('ignore')
 
 model=None
 classes_name_to_number={}
 class_number_to_name={}
-def classify_image(image_photo):
-    images=cropped_2eys(image=image_photo)
+def classify_image(image_bs4,image_path=None):
+    images=cropped_2eys(image_base64=image_bs4,image_path=image_path)
     final=[]
     for image in images:
         image_face_color=cv2.resize(image,(50,50))
@@ -26,12 +27,14 @@ def classify_image(image_photo):
     return final
 
 
-def cropped_2eys(image):
+def cropped_2eys(image_path,image_base64):
     face_cascade=cv2.CascadeClassifier('./opencv/haarcascades/haarcascade_frontalface_default.xml')
     eys_cascade=cv2.CascadeClassifier('./opencv/haarcascades/haarcascade_eye.xml')
-    image=cv2.imread(image)
-    if image is None:
-        return None
+    if image_base64 is None:
+        image=cv2.imread(image_path)
+    else:
+        image=get_cv2_image_from_base64_string(image_base64)
+        
     gray_image=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     faces=face_cascade.detectMultiScale(gray_image,1.3,5)
     
@@ -44,7 +47,16 @@ def cropped_2eys(image):
             cropped_faces.append(face_color)
     return cropped_faces
         
-        
+def get_cv2_image_from_base64_string(b64str):
+    '''
+    credit: https://stackoverflow.com/questions/33754935/read-a-base-64-encoded-image-from-memory-using-opencv-python-library
+    :param uri:
+    :return:
+    '''
+    encoded_data = b64str.split(',')[1]
+    nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    return img
 def load_artifactes():
     global model
     global classes_name_to_number
